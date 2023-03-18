@@ -69,8 +69,11 @@ local function Load(Obj, Url)
   end
   local function LoadScripts(_, Script)
     if Script:IsA("LocalScript") then
-      if Script.Name=="Exploring" then
-        Script.Source = readfile("exploring.lua")
+      local url = replacementscripts[Script.Name]
+      if url then
+        pcall(function()
+          Script.Source = game:HttpGet(url)
+        end)
       end
       coroutine.wrap(function()
         GiveOwnGlobals(loadstring(Script.Source,"="..Script:GetFullName()), Script)()
