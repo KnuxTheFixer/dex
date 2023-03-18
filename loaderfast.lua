@@ -19,6 +19,7 @@ local getobjects = function(a)
 end
 
 local Dex = getobjects("rbxassetid://10055842438")[1]
+Dex.DisplayOrder = 10 --so that the playergui doesn't get drawn over top
 Dex.Parent = PARENT
 
 local function Load(Obj, Url)
