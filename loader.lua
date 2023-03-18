@@ -1,7 +1,7 @@
 --loader script ripped from infinite yield cuz thats the main reason i made this fix
 
 local replacementscripts = {
-  "Exploring" = "https://raw.githubusercontent.com/KnuxTheFixer/dex/main/exploring.lua", -- required for dex to work, notable changes are: replacing a http call to an api that no longer exists with a function that does the same thing, fixing nilinstances and runningscripts folders
+  ["Exploring"] = game:HttpGet("https://raw.githubusercontent.com/KnuxTheFixer/dex/main/exploring.lua",true), -- required for dex to work, notable changes are: replacing a http call to an api that no longer exists with a function that does the same thing, fixing nilinstances and runningscripts folders
 }
 local speedload = false --skip the xml decoding for one premade (may be outdated)
 
@@ -68,11 +68,17 @@ local function Load(Obj, Url)
     return Func
   end
   local function LoadScripts(_, Script)
+    if Script.Name=="Creator" then
+      Script.Text = "Created by: <b>Moon</b>\nEdited by: wally, ic3, w a e\nFixed by: Knux"
+    end
+    if Script.Name=="Version" then
+      Script.Text = "Fixed Version"
+    end --gotta make sure we know who fixed it
     if Script:IsA("LocalScript") then
-      local url = replacementscripts[Script.Name]
-      if url then
+      local source = replacementscripts[Script.Name]
+      if source then
         pcall(function()
-          Script.Source = game:HttpGet(url)
+          Script.Source = source
         end)
       end
       coroutine.wrap(function()
