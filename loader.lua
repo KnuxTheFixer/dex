@@ -18,9 +18,31 @@ local getobjects = function(a)
   return Objects
 end
 
+local function moveiy(dex) --check if iy in running and move it out of the way
+  if Holder then --iy var
+    local menu = dex:WaitForChild("SideMenu",math.huge)
+    local oldpos = menu.AbsolutePosition.X + menu.AbsoluteSize.X --save the position otherwise it wont retract iy along with it
+    local function moveaway()
+      local iypos,dexpos = Holder.AbsolutePosition.X + Holder.AbsoluteSize.X, menu.AbsolutePosition.X + menu.AbsoluteSize.X
+      if iypos >= oldpos then
+        local wsize,iysize = workspace.CurrentCamera.ViewportSize.X,Holder.AbsoluteSize.X
+        Holder.Position = UDim2.new(UDim.new(1,math.clamp(dexpos-iysize,1,wsize-iysize)-wsize),Holder.Position.Y)
+      end
+      oldpos = dexpos
+    end
+    local function noerror()
+      pcall(moveaway)
+    end
+    menu:GetPropertyChangedSignal("Position"):Connect(noerror)
+    Holder:GetPropertyChangedSignal("Position"):Connect(noerror)
+  end
+end
+
 local Dex = getobjects("rbxassetid://10055842438")[1]
-Dex.DisplayOrder = 10 --so that the playergui doesn't get drawn over top
+Dex.DisplayOrder = 10 --so that the playerlist doesn't get drawn over top
 Dex.Parent = PARENT
+game:GetService("StarterGui"):SetCoreGuiEnabled(Enum.CoreGuiType.PlayerList,false) --close the playerlist to make it look better
+task.spawn(moveiy,Dex) --make iy cmdbar move out of the way
 
 local function Load(Obj, Url)
   local function GiveOwnGlobals(Func, Script)
