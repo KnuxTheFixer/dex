@@ -1,8 +1,10 @@
---loader script ripped from infinite yield cuz thats the main reason i made this fix
+--loader script ripped from infinite yield and fixed by knux
+--the lag is caused by xml decoding
 
 local replacementscripts = {
   ["Exploring"] = game:HttpGet("https://raw.githubusercontent.com/KnuxTheFixer/dex/main/exploring.lua",true), -- required for dex to work, notable changes are: replacing a http call to an api that no longer exists with a function that does the same thing, fixing nilinstances and runningscripts folders
 }
+
 local speedload = false --skip the xml decoding for one premade (may be outdated)
 
 InsertService = InsertService or game:GetService("InsertService")
@@ -35,14 +37,29 @@ local function moveiy(dex) --check if iy in running and move it out of the way
     end
     menu:GetPropertyChangedSignal("Position"):Connect(noerror)
     Holder:GetPropertyChangedSignal("Position"):Connect(noerror)
+    noerror()
+  end
+end
+
+local function playerlist(dex)
+  local enabled = game:GetService("StarterGui"):GetCoreGuiEnabled(Enum.CoreGuiType.PlayerList) --check if we even need to run this
+  if enabled then
+    local buttons = {dex:WaitForChild("Toggle",math.huge),dex:WaitForChild("SideMenu",math.huge):WaitForChild("Toggle",math.huge)}
+    local playerlist = game:GetService("CoreGui"):WaitForChild("PlayerList")
+    playerlist.Enabled = false -- set it to false initially since dex opens when ran
+    for _,b in pairs(buttons) do
+      b.MouseButton1Click:Connect(function()
+        playerlist.Enabled = b==buttons[2]
+      end)
+    end
   end
 end
 
 local Dex = getobjects("rbxassetid://10055842438")[1]
-Dex.DisplayOrder = 10 --so that the playerlist doesn't get drawn over top
+Dex.DisplayOrder = 10 --so that other coregui elements don't get drawn over top
 Dex.Parent = PARENT
-game:GetService("StarterGui"):SetCoreGuiEnabled(Enum.CoreGuiType.PlayerList,false) --close the playerlist to make it look better
 task.spawn(moveiy,Dex) --make iy cmdbar move out of the way
+task.spawn(playerlist,Dex) --close the playerlist while open to make it look better
 
 local function Load(Obj, Url)
   local function GiveOwnGlobals(Func, Script)
